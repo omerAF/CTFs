@@ -2,10 +2,13 @@
 
 #### Score: 128
 
+## Description
 
 You need to obtain the flag through two different invisible places.  
 http://52.52.236.217:16401/  
 Submit payload here: http://52.52.236.217:16403/  
+
+## Write UP
   
   
 The page contains multiple JavaScript functions. It reads the value of the GET parameter named "tag", sets it as a cookie, and then,
@@ -32,9 +35,9 @@ using the data provided in the cookie, creates a DOM element:
 This function creates the element. You may notice two interesting things:  
 
 1. A substring is preformed on the value of tag, and only the first char of the string is taken. That means that we can only create
-tags that are single lettered. So no <script> tags, we are forced to use \<a\> or \<p\> for example.  
-2. The function cycles through a cookie named **attrs**, splits it by **&**, and uses the data to create attributes for the tag.
-Without figuring out how to set attributes, we only have a static, boring \<p\> tag, and it doesn't help us much. So how can we cause
+tags that are single lettered. So no `<script>` tags, we are forced to use `<a>` or `<p>` for example.  
+2. The function cycles through a cookie named **attrs**, splits it by `&`, and uses the data to create attributes for the tag.
+Without figuring out how to set attributes, we only have a static, boring `<p>` tag, and it doesn't help us much. So how can we cause
 the JavaScript code to set the attrs cookie?  
 
 **getCookie:**
@@ -72,27 +75,28 @@ http://52.52.236.217:16401/?tag=aattrs=href=https://google.com&test=yay
 
     <a href="https://google.com"></a>
     
-We can't create elements with multiple attribute, because in the first function, **getUrlParam**, there's the following regex:
+We can't create elements with multiple attribute, because in the first function, `getUrlParam`, there's the following regex:
 
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
         var r = unescape(window.location.search.substr(1)).match(reg);
         
-Which splits the string by the char "&". To bypass it we need to URL encode the sign "&" twice, like so:  
+Which splits the string by the char `&`. To bypass it we need to URL encode the sign `&` twice, like so:  
 
-    escape(escape("&"))="%2526"  
-
+    escape(escape("&"))="%2526"
+    
 Now that should work! http://52.52.236.217:16401/?tag=aattrs=href=https://google.com%2526test=yay  
 
 To actually trigger the XSS, I've created the following p tag:
 
     <p id="wow" onfocus="alert(1)" contenteditable=""></p>
     
-By appending a pragma hash to the end of the URL, We can make the browser automaticlly focus on the object and trigger the
-**onfocus** event. For those who are not familiar with how the pragma hash works, the following link: http://site.com#wow would
+By appending a hash (`#` sign, not a cryptographic hash) to the end of the URL, We can make the browser
+automaticlly focus on the object and trigger the
+`onfocus` event. For those who are not familiar with how the hash in URLs works, the following link: http://site.com#wow would
 cause the browser to automaticlly focus on the object that has the id "wow".  
 
-The **contenteditable** attribute is needed to trigger the onfocus event.  
+The `contenteditable` attribute is needed to trigger the onfocus event.  
 
 And here is the final payload: http://52.52.236.217:16401/?tag=pattrs=id=wow%2526onfocus=alert(1)%2526contentEditable=#wow
-You can substitute the **alert(1)** with code that'll log the cookies of the browser to your remote server,
+You can substitute the `alert(1)` with code that'll log the cookies of the browser to your remote server,
 and get the flag that's hidden inside.
