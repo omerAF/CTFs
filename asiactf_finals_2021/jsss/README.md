@@ -6,7 +6,7 @@ Disclamer: Unfortunetly I was only able to solve this challange 1 hour after the
 
 ## Description
 huh, yet another [NodeJS](http://65.21.255.24:5002/) challenge...  
-Download source code from [here](https://asisctf.com/tasks/jsss_79f57b25836a36ef09084064b72bb1607f3029d1.txz)
+Download source code from [here](https://github.com/omerAF/CTFs/raw/master/asiactf_finals_2021/jsss/jsss_79f57b25836a36ef09084064b72bb1607f3029d1.txz)
 
 ## Write UP
 
