@@ -113,8 +113,7 @@ To do so, we can use a **scientific notation**, or **e-notation**
 Using it, it's possible to express 5000000 as 5 * 10⁶, or as `5e6`. Both expressions evaluate to the same number.
 
 Let's say the `uid` we registered with is `9`. We can represent it as 0.9 * 10¹, or `0.9e1`.  
-When our `uid` cookie is being checked in the authentication phase, it's being evaluated as `9`:  
-It seems like we are trying to login to our legitimate user with `uid=9` since "0.9e1" == 0.9e1 == 9  
+When our `uid` cookie is being checked in the authentication phase, it's being evaluated as `9`, since `"0.9e1" == 0.9e1 == 9`
 ```javascript
 if(e[0].uid == "0.9e1" && e[0].password == passwd) // "0.9e1" == 0.9e1 == 9
 ```
@@ -157,11 +156,11 @@ getFlag: _=>{
 }
 ```
 
-It would be perfect if we could call to `readFile` and get the flag, but there is a check that doesn't allow us to get the content of any file containing `flag` in its path.
+It would be perfect if we were able to call to `readFile` and get the flag, but there is a check that doesn't allow us to get the content of any file containing `flag` in its path.
 
 ### Calling a function
 
-Because we can't use an opening parentheses, we need to call functions by using [tagged template literal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
+Because we can't use an opening parentheses (`(`), we need to call functions by using [tagged template literal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
 Basically, it's possible to call functions like this:
 
 ```javascript
@@ -170,7 +169,7 @@ getFlag``
 readFile`/etc/passwd`
 ```
 
-So we can set out `order` cookie to ``` order=getFlag`` ```:
+So we can set our `order` cookie to ``` order=getFlag`` ```:
 
 ```javascript
 // cookie: order=getFlag``
@@ -197,17 +196,17 @@ Is there a way to reference the `/flag.txt` file without explicitly using it's n
 Yes there is! To understand how, you first need to be familiar with these two concepts: [The /proc Filesystem](https://www.kernel.org/doc/html/latest/filesystems/proc.html#process-specific-subdirectories) and [File Descriptors](https://en.wikipedia.org/wiki/File_descriptor)
 
 Basically, the `/proc` filesystem is a directory containing information about running processes (and some other stuff, not relevant for now).  
-File descriptors are unique integer IDs, specific for each process, that help the kernel diffrentiate between open files (and some other stuff, not relevant for now).  
+File descriptors are unique integer IDs, specific for each process, each points to a different open file in the kernel (and some other stuff, not relevant for now).  
 A file descriptor is created when a file is opened, **AND DELETED WHEN THE FILE IS EXPLICITLY CLOSED**. This would be important later.  
 
-Inside the `/proc` filesystem there is a folder for each PID, in which you can find another folder titled `fd`, that contains all the file descriptors that exist at the moment for the process.
+Inside the `/proc` filesystem there is a folder for each PID, in which you can find another folder named `fd`, that contains all the file descriptors that exist at the moment for the process.
 
 Try it for yourselves, open a linux machine and execute:
 ```bash
 ls -al /proc/1/fd
 ```
 You can now see all the file descriptors that exist for the process with the PID 1.  
-Notice that the in the `/proc` filesystem, those file descriptors are links to the original files.  
+Notice that in the `/proc` filesystem the file descriptors are represented as links to the original files.  
 So reading `/proc/1/fd/3` will actually read the file that the file descriptor 3 in the process with the PID 1 is associated with.  
 
 > That means, that if a process on the machine is accessing `/flag.txt` at the moment, it has a file descriptor pointing to it. We can then read the flag from the path: `/proc/{PID}/fd/{FD}`
@@ -227,7 +226,7 @@ readFile: (path)=>{
 }
 ```
 
-The path we give to the `readFile` is read from anyway, **even if the path contains `flag`**. That means, that even if we can't read the contents of `/flag.txt` directly, we can still invoke the creation of a file descriptor by running `readFile('/flag.txt')`.  
+The path we give to the `readFile` function is read from anyway, **even if the path contains `flag`**. That means, that even if we can't read the contents of `/flag.txt` directly, we can still invoke the creation of a file descriptor by running `readFile('/flag.txt')`.  
 We won't be able to get the output, but it would create a file descriptor pointing to `/flag.txt`, in the `nodejs` process.  
 
 So the plan is:
