@@ -5,15 +5,15 @@
 Disclamer: Unfortunetly I was only able to solve this challange 1 hour after the CTF was already over, So I didn't get any points for completing it.
 
 ## Description
-huh, yet another [NodeJS](http://65.21.255.24:5002/) challenge...
+huh, yet another [NodeJS](http://65.21.255.24:5002/) challenge...  
 Download source code from [here](https://asisctf.com/tasks/jsss_79f57b25836a36ef09084064b72bb1607f3029d1.txz)
 
 ## Write UP
 
-In this challange, the goal was to find a vulnerability in the API of an unnamed shop, and to read the flag located in `/flag.txt`.
-The API supports loging in, registering, adding an order to your cart and checking that order out.
+In this challange, the goal was to find a vulnerability in the API of an unnamed shop, and to read the flag located in `/flag.txt`.  
+The API supports loging in, registering, adding an order to your cart and checking that order out.  
 
-To keep track about the Identity of the user, the API uses the following cookies:
+To keep track of the Identity of the user, the API uses the following cookies:
 - uid - The uid recieved on registration.
 - passwd - A hash of the password you registered with.
 - order - The current state of your order.
@@ -58,7 +58,7 @@ if(checkoutTimes.has(req.ip) && checkoutTimes.get(req.ip)+1 > now()){
 	return res.json({ error: true, msg: 'too fast'})
 ```
 
-Everything seems reasonable, except for being logged in as the user with `uid` 0.
+Everything here seems reasonable, except for being logged in as the user with `uid` 0.  
 This account is the first one created, which happens to be the account of the admin:
 ```javascript
 users.add({ username: "admin", password: hashPasswd(rand()), uid: lastUid++ })
@@ -100,21 +100,21 @@ if(parseInt(req.userUid) != 0 || req.userOrder.includes("("))
 
 Noticed something interesting?
 
-In the validation inside `checkout` there is an extra call to `parseInt`.
+In the validation inside `checkout` there is an extra call to `parseInt`.  
 The `uid` cookie is passed as a string to the backend. When comparing it against a number, it's being juggled (=evaluated) as a `float`, but when calling to `parseInt` the server is parsing it as an `int`
 
 > So if we can find a valid float `uid` which evaluate as `0` when we call to `parseInt`, we can login using the password for our account, **AND** pass the validation in `checkout`!!!
 
 To do so, we can use a **scientific notation**, or **e-notation**
 
-#### What's a scientific notation?
+### What's a scientific notation?
 
-[Scientific notation](https://en.wikipedia.org/wiki/Scientific_notation) is a way of expressing extremly large and small numbers.
-That means it's possible to express 5000000 as 5 * 10⁶, or as `5e6`. Both expressions evaluate to the same number.
+[Scientific notation](https://en.wikipedia.org/wiki/Scientific_notation) is a way of expressing extremly large and small numbers.  
+Using it, it's possible to express 5000000 as 5 * 10⁶, or as `5e6`. Both expressions evaluate to the same number.
 
-Let's say the `uid` we registered with is `9`. We can represent it as 0.9 * 10¹, or `0.9e1`.
-When our `uid` cookie is being checked in the authentication phase, it's being evaluated as `9`:
-It seems like we are trying to login to our legitimate user with `uid=9` since "0.9e1" == 0.9e1 == 9
+Let's say the `uid` we registered with is `9`. We can represent it as 0.9 * 10¹, or `0.9e1`.  
+When our `uid` cookie is being checked in the authentication phase, it's being evaluated as `9`:  
+It seems like we are trying to login to our legitimate user with `uid=9` since "0.9e1" == 0.9e1 == 9  
 ```javascript
 if(e[0].uid == "0.9e1" && e[0].password == passwd) // "0.9e1" == 0.9e1 == 9
 ```
@@ -124,9 +124,9 @@ But we also pass the validation in `checkout`, because `parseInt("0.9e1") == 0`:
 if(parseInt(req.userUid) != 0 || req.userOrder.includes("(")) // We pass this validation since parseInt("0.9e1") == 0
 ```
 
-So to bypass the admin validation, we need to send the following cookie instead of the legitimate one: `uid=0.9e1`.
-Notice the malicious `uid` should change according to the legitimate `uid` of the user you own. 
-For example, if the `uid` was `12`, you should set the malicious cookie to `uid=0.12e2`.
+So to bypass the admin validation, we need to send the following cookie instead of the legitimate one: `uid=0.9e1`.  
+Notice the malicious `uid` should change according to the legitimate `uid` of the user you own.   
+For example, if the `uid` was `12`, you should set the malicious cookie to `uid=0.12e2`.  
 
 ### The sandbox
 
@@ -134,8 +134,8 @@ We are now able to execute code inside the sandbox! in case you already forgot, 
 ```javascript
 result = new String(vm.run(`sum([${req.userOrder}])`))
 ````
-And we have control over the `req.userOrder` variable.
-But we face a few limitations:
+And we have control over the `req.userOrder` variable.  
+But we face a few limitations:  
 
 1. The `req.userOrder` variable cannot contain the char `(`.
 2. There is a timeout of 20 milliseconds for the sandbox.
@@ -178,12 +178,12 @@ result = new String(vm.run(`sum([${req.userOrder}])`))
 result = new String(vm.run(`sum([getFlag``])`))
 ```
 
-And it prints out the `secretMessage`, which is [`padoru padoru`](https://www.youtube.com/watch?v=fvO2NFDIEgk).
-But we aren't interested in Anime, so we need to find a way to get the flag.
+And it prints out the `secretMessage`, which is [`padoru padoru`](https://www.youtube.com/watch?v=fvO2NFDIEgk).  
+But we aren't interested in Anime, so we need to find a way to get the flag.  
 
 ### Getting the flag from the sandbox
 
-Notice we can read every file the `app` user has permissions to read, as long as it doesn't contain `flag` in it's path.
+Notice we can read every file the `app` user has permissions to read, as long as it doesn't contain `flag` in it's path.  
 For example, we can read `/etc/passwd`
 
 ```javascript
@@ -196,9 +196,9 @@ Is there a way to reference the `/flag.txt` file without explicitly using it's n
 
 Yes there is! To understand how, you first need to be familiar with these two concepts: [The /proc Filesystem](https://www.kernel.org/doc/html/latest/filesystems/proc.html#process-specific-subdirectories) and [File Descriptors](https://en.wikipedia.org/wiki/File_descriptor)
 
-Basically, the `/proc` filesystem is a directory containing information about running processes (and some other stuff, not relevant for now).
-File descriptors are unique integer IDs, specific for each process, that help the kernel diffrentiate between open files (and some other stuff, not relevant for now).
-A file descriptor is created when a file is opened, **AND DELETED WHEN THE FILE IS EXPLICITLY CLOSED**. This would be important later.
+Basically, the `/proc` filesystem is a directory containing information about running processes (and some other stuff, not relevant for now).  
+File descriptors are unique integer IDs, specific for each process, that help the kernel diffrentiate between open files (and some other stuff, not relevant for now).  
+A file descriptor is created when a file is opened, **AND DELETED WHEN THE FILE IS EXPLICITLY CLOSED**. This would be important later.  
 
 Inside the `/proc` filesystem there is a folder for each PID, in which you can find another folder titled `fd`, that contains all the file descriptors that exist at the moment for the process.
 
@@ -206,9 +206,9 @@ Try it for yourselves, open a linux machine and execute:
 ```bash
 ls -al /proc/1/fd
 ```
-You can now see all the file descriptors that exist for the process with the PID 1.
-Notice that the in the `/proc` filesystem, those file descriptors are links to the original files.
-So reading `/proc/1/fd/3` will actually read the file that the file descriptor 3 in the process with the PID 1 is associated with.
+You can now see all the file descriptors that exist for the process with the PID 1.  
+Notice that the in the `/proc` filesystem, those file descriptors are links to the original files.  
+So reading `/proc/1/fd/3` will actually read the file that the file descriptor 3 in the process with the PID 1 is associated with.  
 
 > That means, that if a process on the machine is accessing `/flag.txt` at the moment, it has a file descriptor pointing to it. We can then read the flag from the path: `/proc/{PID}/fd/{FD}`
 
@@ -227,8 +227,8 @@ readFile: (path)=>{
 }
 ```
 
-The path we give to the `readFile` is read from anyway, **even if the path contains `flag`**. That means, that even if we can't read the contents of `/flag.txt` directly, we can still invoke the creation of a file descriptor by running `readFile('/flag.txt')`.
-We won't be able to get the output, but it would create a file descriptor pointing to `/flag.txt`, in the `nodejs` process.
+The path we give to the `readFile` is read from anyway, **even if the path contains `flag`**. That means, that even if we can't read the contents of `/flag.txt` directly, we can still invoke the creation of a file descriptor by running `readFile('/flag.txt')`.  
+We won't be able to get the output, but it would create a file descriptor pointing to `/flag.txt`, in the `nodejs` process.  
 
 So the plan is:
 1. Start a thread that constently tries to read the flag. It won't succeed, but it will create those precious file descriptors in `/proc/self/fd`.
@@ -247,7 +247,7 @@ readFile`/proc/self/fd/0`, readFile`/proc/self/fd/1`, readFile`/proc/self/fd/2`,
 ```
 And yes, there is probably a better way to implement the file descriptor reader using loops, but it works.
 
-Because the threads start immediatly, there's sometimes a race condition in the rate limmiter validation, that allows us to pass it and run two instances of `checkout` at the same time.
-Either that, or something about my implementation sometimes causes the file descriptor to never close, which works as well.
+Because the threads start immediatly, there's sometimes a race condition in the rate limmiter validation, that allows us to pass it and run two instances of `checkout` at the same time.  
+Either that, or something about my implementation sometimes causes the file descriptor to never close, which works as well.  
 
 > If you have any questions, I'll be glad to answer them. You can do so by opening an issue.
