@@ -160,7 +160,7 @@ It would be perfect if we were able to call to `readFile` and get the flag, but 
 
 ### Calling a function
 
-Because we can't use an opening parentheses (`(`), we need to call functions by using [tagged template literal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).  
+Because we can't use an opening parentheses `(`, we need to call functions by using [tagged template literal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).  
 Basically, it's possible to call functions like this:
 
 ```javascript
