@@ -2,7 +2,9 @@
 
 #### Score: 953
 
-Disclamer: Unfortunetly I was only able to solve this challange 1 hour after the CTF was already over, So I didn't get any points for completing it.
+> Disclamer: Unfortunetly I was only able to solve this challange 1 hour after the CTF was already over, So I didn't get any points for completing it.
+
+> If you have any questions, I'll be glad to answer them. You can do so by opening an issue.
 
 ## Description
 huh, yet another [NodeJS](http://65.21.255.24:5002/) challenge...  
@@ -231,7 +233,7 @@ We won't be able to get the output, but it would create a file descriptor pointi
 
 ### The final solution ;)
 So the plan is:
-1. Start a thread that constently tries to read the flag. It won't succeed, but it will create those precious file descriptors in `/proc/self/fd`.
+1. Start a thread that constently tries to read the flag. It won't succeed, but it will be creating those precious file descriptors in `/proc/self/fd`.
 2. Imediatly start another thread, that tries to read all the files in `/proc/self/fd`.
 3. Continue doing step 1 and 2 until it works.
 
@@ -249,5 +251,3 @@ And yes, there is probably a better way to implement the file descriptor reader 
 
 Because the threads start immediatly, there's sometimes a race condition in the rate limmiter validation, that allows us to pass it and run two instances of `checkout` at the same time.  
 Either that, or something about my implementation sometimes causes the file descriptor to never close, which works as well.  
-
-> If you have any questions, I'll be glad to answer them. You can do so by opening an issue.
