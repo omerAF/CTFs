@@ -229,6 +229,7 @@ readFile: (path)=>{
 The path we give to the `readFile` function is read from anyway, **even if the path contains `flag`**. That means, that even if we can't read the contents of `/flag.txt` directly, we can still invoke the creation of a file descriptor by running `readFile('/flag.txt')`.  
 We won't be able to get the output, but it would create a file descriptor pointing to `/flag.txt`, in the `nodejs` process.  
 
+### The final solution ;)
 So the plan is:
 1. Start a thread that constently tries to read the flag. It won't succeed, but it will create those precious file descriptors in `/proc/self/fd`.
 2. Imediatly start another thread, that tries to read all the files in `/proc/self/fd`.
