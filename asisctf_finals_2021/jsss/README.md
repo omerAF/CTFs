@@ -110,7 +110,7 @@ To do so, we can use a **scientific notation**, or **e-notation**
 ### What's a scientific notation?
 
 [Scientific notation](https://en.wikipedia.org/wiki/Scientific_notation) is a way of expressing extremly large and small numbers.  
-Using it, it's possible to express 5000000 as 5 * 10⁶, or as `5e6`. Both expressions evaluate to the same number.
+Using it, it's possible to express numbers like 5000000 as 5 * 10⁶, or as `5e6`. Both expressions evaluate to the same number.
 
 Let's say the `uid` we registered with is `9`. We can represent it as 0.9 * 10¹, or `0.9e1`.  
 When our `uid` cookie is being checked in the authentication phase, it's being evaluated as `9`, since `"0.9e1" == 0.9e1 == 9`
@@ -160,7 +160,7 @@ It would be perfect if we were able to call to `readFile` and get the flag, but 
 
 ### Calling a function
 
-Because we can't use an opening parentheses (`(`), we need to call functions by using [tagged template literal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
+Because we can't use an opening parentheses (`(`), we need to call functions by using [tagged template literal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).  
 Basically, it's possible to call functions like this:
 
 ```javascript
@@ -182,7 +182,7 @@ But we aren't interested in Anime, so we need to find a way to get the flag.
 
 ### Getting the flag from the sandbox
 
-Notice we can read every file the `app` user has permissions to read, as long as it doesn't contain `flag` in it's path.  
+Notice we can read every file the `app` user has permissions to read, as long as it doesn't contain `flag` in its path.  
 For example, we can read `/etc/passwd`
 
 ```javascript
@@ -191,7 +191,7 @@ result = new String(vm.run(`sum([${req.userOrder}])`))
 result = new String(vm.run('sum([readFile`/etc/passwd`])'))
 ```
 
-Is there a way to reference the `/flag.txt` file without explicitly using it's name?
+Is there a way to reference the `/flag.txt` file without explicitly using its name?
 
 Yes there is! To understand how, you first need to be familiar with these two concepts: [The /proc Filesystem](https://www.kernel.org/doc/html/latest/filesystems/proc.html#process-specific-subdirectories) and [File Descriptors](https://en.wikipedia.org/wiki/File_descriptor)
 
