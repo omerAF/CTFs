@@ -2,7 +2,6 @@
 
 #### Score: 896
 
-Solution script: [solution.py](solution.py)
 > If you have any questions, I'll be glad to answer them. You can do so by opening an issue.
 
 ## Description
