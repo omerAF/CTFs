@@ -19,9 +19,9 @@ Note: the flag is in `/flag.txt`
 
 ## Write UP
 
-In this challenge, we are presented with a pastebin website. We can input text and save it.
+In this challenge, we are presented with a pastebin-like website. We can input text and save it.
 
-But how does the server keep track of who we are? Apparently there's an `auth` cookie, which contains data that's being used to identify us and keep track of each user's paste.
+But how does the server keep track of who we are? After a quick examination we can figure out there's an `auth` cookie, which contains data that's being used to identify us and keep track of each user's paste.
 
 ### How Does the Authentication Work?
 
@@ -43,9 +43,9 @@ function makeAuth(req, res, next) {
 }
 ```
 
-So it seems every cookie contains a ciphertext encrypted using `aes-256-gcm`. More specifically, it's made from an `iv`, `authTag` and `ct`, the ciphertext, base64-ed and joined with a dot.
+So it seems every cookie contains a ciphertext encrypted using `aes-256-gcm`. More specifically, it's made from an `iv`, `authTag` and `ct`, joined with a dot. The `ct` is the ciphertext base64-ed.
 
-The ciphertext itself contains a javascript object with a path to a temp file, which contains each user's note. An example object would look like this:
+The matching plaintext of the ciphertext contains a javascript object with a path to a temp file, which in turn contains the note of the user. An example object would look like this:
 
 ```json
 {"tmpfile":"/tmp/pastestore/1234567890abcdef"}
@@ -65,7 +65,7 @@ So if we could somehow change the path of the `tmpfile` to point to `/flag.txt`,
 
 ### Modifying the Cookie
 
-We are faced with our first problem: The ciphertext we are trying to modify is being encrypted with a random key we don't know the value of. To understand how we can do that, we first need to understand how AES GCM works.
+We are faced with our first problem: The ciphertext we are trying to modify is being encrypted with a random key we don't know the value of. To understand how we can do that even without knowing the key, we first need to understand how AES GCM works.
 
 [AES GCM](https://en.wikipedia.org/wiki/Galois/Counter_Mode) is a symmetric encryption algorithm, which uses counter mode to encrypt data. Counter mode basically works like a [stream cipher](https://en.wikipedia.org/wiki/Stream_cipher): AES GCM receives a key and an IV, and uses it to generate a seemingly random stream of bytes called the encryption stream, which is then being XORed with the plaintext to produce the ciphertext.
 
