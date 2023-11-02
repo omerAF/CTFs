@@ -252,5 +252,5 @@ And yes, there is probably a better way to implement the file descriptor reader 
 Because the threads start immediatly, there's sometimes a race condition in the rate limmiter validation, that allows us to pass it and run two instances of `checkout` at the same time.  
 Either that, or something about my implementation sometimes causes the file descriptor to never close, which works as well.
 
-Solution script: [solve.py](solve.py)
+Solution script: [solution.py](solution.py)
 
