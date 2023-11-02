@@ -231,7 +231,7 @@ readFile: (path)=>{
 The path we give to the `readFile` function is read from anyway, **even if the path contains `flag`**. That means, that even if we can't read the contents of `/flag.txt` directly, we can still invoke the creation of a file descriptor by running `readFile('/flag.txt')`.  
 We won't be able to get the output, but it would create a file descriptor pointing to `/flag.txt`, in the `nodejs` process.  
 
-### The final solution ;)
+### The Solution
 So the plan is:
 1. Start a thread that constently tries to read the flag. It won't succeed, but it will be creating those precious file descriptors in `/proc/self/fd`.
 2. Imediatly start another thread, that tries to read all the files in `/proc/self/fd`.
@@ -250,4 +250,7 @@ readFile`/proc/self/fd/0`, readFile`/proc/self/fd/1`, readFile`/proc/self/fd/2`,
 And yes, there is probably a better way to implement the file descriptor reader using loops, but it works.
 
 Because the threads start immediatly, there's sometimes a race condition in the rate limmiter validation, that allows us to pass it and run two instances of `checkout` at the same time.  
-Either that, or something about my implementation sometimes causes the file descriptor to never close, which works as well.  
+Either that, or something about my implementation sometimes causes the file descriptor to never close, which works as well.
+
+Solution script: [solve.py](solve.py)
+
