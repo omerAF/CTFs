@@ -75,11 +75,11 @@ So for a given key and IV, you'd always get the same encryption stream.
 
 The formula given to calculate a ciphertext at position `i` given an encryption stream `E` is:
 
-![cipher=plaintext_xor_E](https://latex.codecogs.com/png.image?cipher_{i}=%20plaintext_{i}%20\oplus%20E_{i})
+![cipher=plaintext_xor_E](https://latex.codecogs.com/png.image?\fg{ffffff}%20cipher_{i}=%20plaintext_{i}%20\oplus%20E_{i})
 
 Because the inverse of the XOR operation is the XOR operation itself, it's possible to rearrange the formula to look like this:
 
-![E=plaintext_xor_cipher](https://latex.codecogs.com/png.image?E_{i}=%20plaintext_{i}%20\oplus%20cipher_{i})
+![E=plaintext_xor_cipher](https://latex.codecogs.com/png.image?\fg{ffffff}%20E_{i}=%20plaintext_{i}%20\oplus%20cipher_{i})
 
 So given both the plaintext and the ciphertext, it's possible to calculate the encryption stream.
 
